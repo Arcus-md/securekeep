@@ -1,11 +1,12 @@
 /**
  * Login API Route
  */
-export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword } from '@/lib/server-crypto';
 
+export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();

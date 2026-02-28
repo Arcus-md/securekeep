@@ -1,0 +1,88 @@
+// SecureKeep - E2E Encrypted Notes Application
+// All sensitive data is encrypted client-side before storage
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  // Password hash (argon2id) - never the actual password or encryption key
+  passwordHash String
+  // Salt for key derivation (separate from password hash salt)
+  keySalt      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  notes        Note[]
+  labels       Label[]
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Encrypted content (base64 encoded ciphertext)
+  title       String   // Encrypted title
+  content     String?  // Encrypted body content
+  // Note metadata (stored in plaintext for sorting/filtering)
+  color       String?  // Note color (hex or name)
+  isPinned    Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  // Relations
+  images      Image[]
+  labels      NoteLabel[]
+  
+  @@index([userId, isDeleted])
+  @@index([userId, isPinned])
+  @@index([userId, createdAt])
+}
+
+model Image {
+  id           String   @id @default(cuid())
+  noteId       String
+  note         Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  // Encrypted image data (base64 encoded ciphertext)
+  data         String
+  // Original image mime type (stored in plaintext)
+  mimeType     String
+  // Order for display
+  order        Int      @default(0)
+  // Timestamps
+  createdAt    DateTime @default(now())
+  
+  @@index([noteId])
+  @@index([noteId, order])
+}
+
+model Label {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String      // Encrypted label name
+  color     String?     // Label color
+  notes     NoteLabel[]
+  createdAt DateTime    @default(now())
+  
+  @@unique([userId, name])
+}
+
+model NoteLabel {
+  noteId   String
+  labelId  String
+  note     Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  label    Label  @relation(fields: [labelId], references: [id], onDelete: Cascade)
+  
+  @@id([noteId, labelId])
+}

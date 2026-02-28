@@ -2,7 +2,7 @@
  * Notes API Routes
  * All note data is stored encrypted - the server never sees plaintext content
  */
-
+export const runtime = 'edge';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 

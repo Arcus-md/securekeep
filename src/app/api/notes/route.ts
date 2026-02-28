@@ -2,10 +2,11 @@
  * Notes API Routes
  * All note data is stored encrypted - the server never sees plaintext content
  */
-export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export const runtime = 'edge';
 // GET /api/notes - Get all notes for a user
 export async function GET(request: NextRequest) {
   try {

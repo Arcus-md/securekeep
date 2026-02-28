@@ -61,11 +61,15 @@ export async function POST(request: NextRequest) {
         keySalt: user.keySalt,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Signup error:', error);
+    // Force the app to show you the REAL error on the screen
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { 
+        success: false, 
+        error: error.message || 'Unknown crash',
+        name: error.name
+      },
       { status: 500 }
     );
   }
-}

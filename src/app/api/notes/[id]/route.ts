@@ -1,10 +1,11 @@
 /**
  * Single Note API Routes
  */
-export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export const runtime = 'edge';
 // GET /api/notes/[id] - Get a single note
 export async function GET(
   request: NextRequest,
